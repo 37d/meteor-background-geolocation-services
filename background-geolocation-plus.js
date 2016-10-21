@@ -22,46 +22,49 @@ BackgroundLocation = {
     getPlugin: function() {
         this.plugin = window.plugins.backgroundLocationServices;
     },
-    havePlugin : function() {
+    hasPluginFunction: function (name) {
+        //console.log(this.tag, 'hasPluginFunction', name);
+        return this.hasPlugin() && typeof this.plugin[name] === 'function';
+    },
+    hasPlugin: function() {
         if(!this.plugin) {
-            throw new Meteor.Error(this.tag, 'Could not find the background location plugin, please run BackgroundLocation.getPlugin');
+            console.log(this.tag + ' Could not find plugin, please run BackgroundLocation.getPlugin');
             return false;
         }
         return true;
     },
     configure: function(config) {
-        if(!this.havePlugin()) return;
+        if(!this.hasPluginFunction(arguments.callee.name)) return;
 
         if(_.isObject(config)) {
             this.config = config;
-            this.plugin.configure(this.config);
+            this.plugin.configure && this.plugin.configure(this.config);
         } else {
             throw new Meteor.Error(this.tag, 'Config parameter must be a object')
         }
     },
     registerForLocationUpdates: function(success, failure){
-        if(!this.havePlugin()) return;
+        if(!this.hasPluginFunction(arguments.callee.name)) return;
 
         this.hasLocationCallback = true;
         this.plugin.registerForLocationUpdates(success, failure);
     },
     registerForActivityUpdates: function(success, failure){
-        if(!this.havePlugin()) return;
+        if(!this.hasPluginFunction(arguments.callee.name)) return;
 
         this.plugin.registerForActivityUpdates(success, failure);
     },
     start: function() {
-        if(!this.havePlugin()) return;
+        if(!this.hasPluginFunction(arguments.callee.name)) return;
 
         if(!this.hasLocationCallback) {
             throw new Meteor.Error(this.tag, 'You must register for location updates before starting background location updates');
         }
 
         this.plugin.start();
-
     },
     stop: function() {
-        if(!this.havePlugin()) return;
+        if(!this.hasPluginFunction(arguments.callee.name)) return;
 
         this.plugin.stop();
     }
